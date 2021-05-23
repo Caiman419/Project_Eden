@@ -6,12 +6,10 @@
 - 201811152 이재욱
 - 201811159 차형준
 - 201811160 최보원
----
 ## 유투브 영상 링크
-https://youtu.be/JRvdVgdf9Ug
+- https://youtu.be/JRvdVgdf9Ug
 ## 기획서 주소
-https://www.notion.so/Project-Eden-15e1790bd5924716922899523eaa1c92
----
+- https://www.notion.so/Project-Eden-15e1790bd5924716922899523eaa1c92
 ## Project : Eden 개요
 - Project : Eden은 "폭식(Gula)"이라고 하는 식인 바이러스가 창궐해 무너진 미래의 한국을 가정하여 유저로 하여금 바이러스를 퍼뜨린 범인으로 추정되는 사이비 종교 "돌아온 에덴(Neo Eden)"에 침투하여 그 증거를 조사하고 사람을 구출하며 백신을 찾도록 하는 잠입 액션 게임입니다.
 
