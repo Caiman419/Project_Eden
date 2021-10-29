@@ -16,7 +16,9 @@ enum class EEnemyState : uint8
 	Track,//추적
 	Attack,//공격
 	BeAttacked,//피격
+	Error,
 };
+
 
 UCLASS()
 class WORK1_API AEnemy : public ACharacter
@@ -64,9 +66,9 @@ protected:
 	TMap<EEnemyState, float> EnemySpeed;
 
 	//수색위치
-	UPROPERTY(VisibleAnywhere, Category = "SearchPoiont")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SearchPoiont")
 	USceneComponent* SearchPointX;
-	UPROPERTY(VisibleAnywhere, Category = "SearchPoiont")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SearchPoiont")
 	USceneComponent* SearchPointY;
 	//최초스폰지점
 	FVector InitLocation;
@@ -129,6 +131,8 @@ public:
 	//피격 애니메이션 재생 끝
 	UFUNCTION(BlueprintCallable, Category = "EnemyAnimFunc")
 	virtual void OnEndAttacked() {}
+	UFUNCTION(BlueprintCallable, Category = "EnemyAnimFunc")
+	virtual bool GetIsPlayingAttackAnim() { return false; }
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "KillEnemy")
@@ -148,4 +152,7 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable, Category = "KillEnemy")
 	bool GetKilled();
+
+	UFUNCTION(BlueprintCallable, Category = "PlayAnim")
+	bool GetPlayBeAttackedAnim();
 };

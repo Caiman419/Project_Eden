@@ -34,7 +34,7 @@ void AHumanEnemy::Tick(float DeltaTime)
 	ChangeState();
 	DoState();
 
-	UE_LOG(LogClass, Log, TEXT("Current Aggro %f"),Aggression);
+	//UE_LOG(LogClass, Log, TEXT("Current Aggro %f"),Aggression);
 
 	if (IsInView() == true)
 	{
@@ -228,14 +228,22 @@ void AHumanEnemy::ChangeState()
 
 EEnemyState AHumanEnemy::CheckConditionState()
 {
+	//UE_LOG(LogTemp, Warning, TEXT("CurPlayBeAttackedAnim : %s"), PlayBeAttackedAnim?TEXT("true"):TEXT("false"));
 	if (PlayBeAttackedAnim)
 	{
+		Aggression = 45;
+		return EEnemyState::BeAttacked;
+		/*
 		if (CurState == EEnemyState::Watch || CurState == EEnemyState::Search)
 		{
 			Aggression = 40;
-			return EEnemyState::Track;
+			return EEnemyState::BeAttacked;
 		}
-		//return EEnemyState::BeAttacked;
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("213123123"));
+		}
+		*/
 	}
 
 	//Watch
@@ -244,6 +252,11 @@ EEnemyState AHumanEnemy::CheckConditionState()
 	{
 		//Watch를 유지
 		return EEnemyState::Watch;
+	}
+	//모든 상태에서 공격가능범위 안에 플레이어가 있다면 진입
+	else if (bIsInAttack == true)
+	{
+		return EEnemyState::Attack;
 	}
 	/*
 	else if ((Aggression >= 10 && Aggression < 40) && bIsInView == false)
@@ -280,6 +293,10 @@ EEnemyState AHumanEnemy::CheckConditionState()
 		//추적상태로 진입
 		return EEnemyState::Track;
 	}
+	else if (Aggression >= 30)
+	{
+		return EEnemyState::Track;
+	}
 	//현재 상태가 수색상태이고 시야에 플레이어가 있다면
 	else if (CurState == EEnemyState::Search && bIsInView == true)
 	{
@@ -297,14 +314,7 @@ EEnemyState AHumanEnemy::CheckConditionState()
 		}
 	}
 	//피격시 추적으로 진입하는 코드 짜기
-
-	
 	//Attack
-	//모든 상태에서 공격가능범위 안에 플레이어가 있다면 진입
-	else if (bIsInAttack == true)
-	{
-		return EEnemyState::Attack;
-	}
 	else if (bIsInAttack == false && bIsPlayingAttackAnim == false)
 	{
 		if (CurState == EEnemyState::Attack)
@@ -438,6 +448,10 @@ void AHumanEnemy::EnterTrack()
 
 void AHumanEnemy::EnterAttack()
 {
+	if (Aggression < 40)
+	{
+		Aggression = 40;
+	}
 	AttackCount = 0;
 	bCanAttack = true;
 }
@@ -637,30 +651,30 @@ void AHumanEnemy::DoSearch()
 
 void AHumanEnemy::DoTrack()
 {
-	FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-	AAIController* AIController = Cast<AAIController>(GetController());
-
-	//시선방향은 플레이어위치
-	//시선 방향은 목적지
-	GetCharacterMovement()->bOrientRotationToMovement = false;
-
-	FRotator EnemyRotator = GetActorRotation();
-	FRotator ChangeRotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PlayerLocation);
-	SetActorRotation(FRotator(EnemyRotator.Pitch, ChangeRotator.Yaw, EnemyRotator.Roll));
-
-	if (AIController)
+	if (bIsInView == true)
 	{
-		//플레이어 쫓아감
-		Cast<AAIController>(GetController())->MoveToLocation(PlayerLocation);
+		FVector PlayerLocation = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+		AAIController* AIController = Cast<AAIController>(GetController());
+
+		//시선방향은 플레이어위치
+		//시선 방향은 목적지
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+
+		FRotator EnemyRotator = GetActorRotation();
+		FRotator ChangeRotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PlayerLocation);
+		SetActorRotation(FRotator(EnemyRotator.Pitch, ChangeRotator.Yaw, EnemyRotator.Roll));
+
+		if (AIController)
+		{
+			//플레이어 쫓아감
+			Cast<AAIController>(GetController())->MoveToLocation(PlayerLocation);
+		}
 	}
-
-	//HUD변화
-
 	//플레이어가 시야각에 없다면
-	if (bIsInView == false)
+	else
 	{
 		//초당 10씩 어그로 감소
-		AggressionDown();
+		//AggressionDown();
 	}
 }
 
@@ -693,6 +707,9 @@ void AHumanEnemy::DoState()
 void AHumanEnemy::OnDamage(float Damage)
 {
 	PlayBeAttackedAnim = true;
+	UE_LOG(LogTemp, Warning, TEXT("PlayBeAttackedAnim = true"));
+	bIsPlayingAttackAnim = false;
+	PipeBoxComponent->SetGenerateOverlapEvents(false);
 
 	HP = HP - Damage;
 	if (GetHP() <= 0)
@@ -722,26 +739,21 @@ void AHumanEnemy::HideThings(USceneCaptureComponent2D* SceneComponent)
 
 void AHumanEnemy::OnStartAttack()
 {
+	UE_LOG(LogTemp, Warning, TEXT("OnStartAttack"));
 	bIsPlayingAttackAnim = true;
 	PipeBoxComponent->SetGenerateOverlapEvents(true);
 }
 
 void AHumanEnemy::OnEndAttack()
 {
-	bIsPlayingAttackAnim = false;
-	PipeBoxComponent->SetGenerateOverlapEvents(true);
-	AttackCount++;
-	if (AttackCount == 3)
-	{
-		bCanAttack = false;
-
-		//공전
-	}
+	bIsPlayingAttackAnim = true;
+	PipeBoxComponent->SetGenerateOverlapEvents(false);
 }
 
 void AHumanEnemy::OnEndAttacked()
 {
 	PlayBeAttackedAnim = false;
+	//UE_LOG(LogTemp, Warning, TEXT("PlayBeAttackedAnim = false"));
 }
 
 bool AHumanEnemy::GetIsAttacking()
@@ -749,11 +761,22 @@ bool AHumanEnemy::GetIsAttacking()
 	return bCanAttack && bIsInAttack;
 }
 
+bool AHumanEnemy::GetIsPlayingAttackAnim()
+{
+	return bIsPlayingAttackAnim;
+}
+
 void AHumanEnemy::OnDeath()
 {
-	Super::OnDeath();
-	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
-	GetMesh()->SetSimulatePhysics(true);
+	if (!GetKilled())
+	{
+		Super::OnDeath();
+		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetMesh()->SetSimulatePhysics(true);
+
+		auto gameMode = Cast<AEdenGameMode>(GetWorld()->GetAuthGameMode());
+		gameMode->NumDeadEnemy[EEnemyType::HumanEnemy] += 1;
+	}
 }
 
 void AHumanEnemy::StealthKill()

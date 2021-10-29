@@ -9,6 +9,13 @@
 class AHumanEnemy;
 class AEnemy;
 
+UENUM(BlueprintType)
+enum class EEnemyType : uint8
+{
+	HumanEnemy,
+	ZombieEnemy,
+};
+
 UCLASS()
 class WORK1_API AEdenGameMode : public AGameModeBase
 {
@@ -28,6 +35,15 @@ public:
 	void AggroUp(float Aggro);
 	UFUNCTION(BlueprintCallable, Category = "EdenGameMode")
 	TArray<AEnemy*>& GetEnemyList();
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
+	TMap<EEnemyType, int> NumDeadEnemy;
+
+	UFUNCTION(BlueprintCallable, Category = "NumDeadEnemy")
+	int GetNumDeadHumanEnemy();
+
+	UFUNCTION(BlueprintCallable, Category = "NumDeadEnemy")
+	int GetNumDeadZombieEnemy();
 
 private:
 	TArray<AEnemy*> EnemyArray;

@@ -19,9 +19,9 @@ public:
 	virtual void BeginPlay() override;
 
 	//무기관련컴포넌트들
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UBoxComponent* PipeBoxComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UStaticMeshComponent* PipeMeshComponent;
 
 	//기본 변수들(일단 근거리인간형적 기준으로 작성.추후 문제되면 수정)->생성자 또는 비긴플레이에서 초기화 꼭해줘라
@@ -32,7 +32,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "BaseProperty")
 	float Speed = 0.f;//이동속도
 	FString Weapon = "Pipe";//장착무기
-	UPROPERTY(EditAnywhere, Category = "BaseProperty")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "BaseProperty")
 	float WeaponDamage = 7.5;//장착무기 데미지
 	UPROPERTY(EditAnywhere, Category = "BaseProperty")
 	int AngleView = 70;//시야각
@@ -93,7 +93,7 @@ public:
 	//상태 들어갈때
 	void EnterWatch();
 	void EnterSearch();
-	void EnterTrack();
+	virtual void EnterTrack();
 	void EnterAttack();
 	void EnterBeAttacked();
 
@@ -103,7 +103,7 @@ public:
 	//상태별 행동
 	void DoWatch();
 	void DoSearch();
-	void DoTrack();
+	virtual void DoTrack();
 	void DoAttack();
 
 	//특수상태
@@ -117,7 +117,7 @@ public:
 	virtual void OnStartAttack() override;
 	virtual void OnEndAttack() override;
 	virtual void OnEndAttacked() override;
-
+	virtual bool GetIsPlayingAttackAnim() override;
 
 	//HP리턴
 	float GetHP();
@@ -131,7 +131,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HumenEnemyGetter")
 	bool GetIsAttacking();
 
-private:
+protected:
 
 	//searchCount
 	int SearchCount;

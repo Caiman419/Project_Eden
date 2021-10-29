@@ -94,3 +94,8 @@ bool AEnemy::GetKilled()
 {
 	return Killed;
 }
+
+bool AEnemy::GetPlayBeAttackedAnim()
+{
+	return PlayBeAttackedAnim;
+}

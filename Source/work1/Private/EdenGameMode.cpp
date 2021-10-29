@@ -4,6 +4,8 @@
 void AEdenGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	//NumDeadEnemy[EEnemyType::HumanEnemy] = 0;
+	//NumDeadEnemy[EEnemyType::ZombieEnemy] = 0;
 }
 
 void AEdenGameMode::AddEnemy(AEnemy* NewEnemy)
@@ -30,4 +32,16 @@ void AEdenGameMode::AggroUp(float Aggro)
 TArray<AEnemy*>& AEdenGameMode::GetEnemyList()
 {
 	return EnemyArray;
+}
+
+int AEdenGameMode::GetNumDeadHumanEnemy()
+{
+	int Num = NumDeadEnemy[EEnemyType::HumanEnemy];
+	return Num;
+}
+
+int AEdenGameMode::GetNumDeadZombieEnemy()
+{
+	int Num = NumDeadEnemy[EEnemyType::ZombieEnemy];
+	return Num;
 }
